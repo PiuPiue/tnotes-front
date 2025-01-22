@@ -1,23 +1,60 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Home from '../views/home.vue'
+import NotesDashboard from '../views/NotesIndex.vue'
+
+import NoteBookDetail from '@/views/NotebookDetail.vue'
+import NoteDetail from '@/views/NoteDetail.vue'
+
+import CloudIndex from '@/views/CloudIndex.vue'
+import AuthIndex from '@/views/Login.vue'
+
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+      //设置默认路由
+      {
+        path: '/',
+        redirect: '/home',
+        component: Home
+      },
+      {
+        path: '/login',
+        name: 'Auth',
+        component: AuthIndex
+      },
+      {
+        path: '/home',
+        name: 'Home',
+        component: Home,
+        children: [
+          {
+            path: 'notebook',
+            name: 'NotesDashboard',
+            component: NotesDashboard
+          },
+          
+          {
+            path: 'notebook/detail:notebookId',
+            name: 'NotebookDetail',
+            component: NoteBookDetail
+          },
+        
+          {
+            path: 'note:noteId',
+            name: 'NoteDetail',
+            component: NoteDetail
+          }
+          ,
+          {
+            path: 'cloud',
+            name: 'CloudIndex',
+            component: CloudIndex
+          }
+        ]
+      },
+
 ]
 
 const router = new VueRouter({

@@ -1,0 +1,11 @@
+/* 浅色主题 */
+body {
+    background-color: #f5f7fa;
+    color: #333;
+  }
+  
+  /* 深色主题 */
+  body.dark-theme {
+    background-color: #333;
+    color: #f5f7fa;
+  }
