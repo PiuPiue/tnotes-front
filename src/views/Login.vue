@@ -134,7 +134,7 @@
             this.$message.success('登录成功');
             localStorage.setItem('Authorization', response.data.data.token);
             localStorage.setItem('userInfo', JSON.stringify(response.data.data));
-            this.$router.push('/home'); // 跳转到首页
+            this.$router.push('/home/newworld'); // 跳转到首页
           } else {
             this.$message.error('登录失败：' + response.data.message);
           }

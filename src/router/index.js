@@ -8,7 +8,8 @@ import NoteDetail from '@/views/NoteDetail.vue'
 
 import CloudIndex from '@/views/CloudIndex.vue'
 import AuthIndex from '@/views/Login.vue'
-
+import NewWorldIndex from '@/views/NewWorldIndex.vue'
+import EssayEditor from '@/views/EssayEditor.vue'
 
 Vue.use(VueRouter)
 
@@ -30,6 +31,11 @@ const routes = [
         component: Home,
         children: [
           {
+            path: 'newworld',
+            name: 'NewWorldIndex',
+            component: NewWorldIndex
+          },
+          {
             path: 'notebook',
             name: 'NotesDashboard',
             component: NotesDashboard
@@ -40,13 +46,12 @@ const routes = [
             name: 'NotebookDetail',
             component: NoteBookDetail
           },
-        
           {
-            path: 'note:noteId',
-            name: 'NoteDetail',
-            component: NoteDetail
-          }
-          ,
+            path: 'notebook/essayeditor:essayId',
+            name: 'EssayEditor',
+            component: EssayEditor
+          },
+        
           {
             path: 'cloud',
             name: 'CloudIndex',
@@ -54,6 +59,11 @@ const routes = [
           }
         ]
       },
+      {
+        path: '/home/note:noteId',
+        name: 'NoteDetail',
+        component: NoteDetail
+      }
 
 ]
 

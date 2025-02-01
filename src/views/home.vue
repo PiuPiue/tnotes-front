@@ -7,12 +7,6 @@
 
     <!-- 主体内容 -->
     <div class="main-content">
-      <!-- 侧边栏 -->
-      <div class="sliderbar">
-        <SliderBar></SliderBar>
- 
-      </div>
-
       <!-- 内容区域 -->
       <div class="content-area">
         <router-view></router-view> <!-- 动态加载内容 -->
@@ -22,57 +16,58 @@
 </template>
 
 <script>
-import TopBar from '@/components/topbar.vue'
-import SliderBar from '@/components/sliderbar.vue';
+import TopBar from '@/components/topbar.vue';
 
 export default {
-  components: { TopBar, SliderBar },
-  name: 'HomePage'
+  components: { TopBar },
+  name: 'HomePage',
 };
 </script>
 
 <style scoped>
+/* 整体布局 */
 .home-page {
- 
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   height: 100vh;
-}
-.home-page::-webkit-scrollbar {
-  width: 0px;
-}
-
-.topbar {
-  
-  height: 60px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
-.main-content {
-  display: flex;
-  flex: 1;
   overflow: hidden;
 }
 
-.sliderbar {
-  overflow-x: auto;
-  background-color: #ffffff;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+/* 隐藏滚动条 */
+.home-page::-webkit-scrollbar {
+  width: 0;
+}
+
+/* 顶部栏 */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 63px; /* 高度 */
+  background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+  backdrop-filter: blur(12px); /* 毛玻璃效果 */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* 底部边框 */
+  z-index: 1000; /* 确保在最上层 */
+}
+
+/* 主体内容 */
+.main-content {
+  
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  margin-top: 38px;
+}
+
+/* 内容区域 */
+.content-area {
+  flex: 1;
   overflow-y: auto; /* 支持滚动 */
 }
 
-/* home.vue */
-.content-area {
-  flex: 1;
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa, #e2e6ee);
-  overflow-y: auto;
-}
-
-.content-area::-webkit-scrollbar{
+/* 隐藏内容区域的滚动条 */
+.content-area::-webkit-scrollbar {
   width: 0;
 }
 </style>

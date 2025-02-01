@@ -22,5 +22,5 @@
 
 /* Adjust the toolbar position in narrow mode (optional) */
 .codex-editor--narrow .ce-toolbar__actions {
-    right: -40px; /* Adjust toolbar position as needed */
+    right: -100px; /* Adjust toolbar position as needed */
 }
