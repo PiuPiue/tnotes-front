@@ -1,32 +1,34 @@
 /* 全局按钮样式调整 */
 .el-button {
   border-radius: 8px;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif; /* 使用与侧边栏一致的字体 */
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .el-button--primary {
-  background-color: #2563eb;
-  border-color: #2563eb;
+  background-color: #6366F1; /* 使用侧边栏的主色调 */
+  border-color: #6366F1;
+  color: #ffffff;
 }
 
 .el-button--primary:hover {
-  background-color: #1e4bb5;
-  border-color: #1e4bb5;
+  background-color: #4F46E5; /* 主色调的深色变体 */
+  border-color: #4F46E5;
 }
 
 .el-button--default {
   background-color: #ffffff;
-  border-color: #e5e7eb;
+  border-color: #E0E7FF; /* 使用侧边栏的边框颜色 */
   color: #4b5563;
 }
 
 .el-button--default:hover {
-  background-color: #f3f4f6;
-  border-color: #e5e7eb;
+  background-color: #F8F9FF; /* 使用侧边栏的背景色 */
+  border-color: #E0E7FF;
 }
+
 /* 对话框样式调整 */
 .el-dialog {
   border-radius: 12px;
@@ -34,14 +36,14 @@
 }
 
 .el-dialog__header {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #E0E7FF; /* 使用侧边栏的边框颜色 */
   padding: 16px;
 }
 
 .el-dialog__title {
   font-size: 18px;
   font-weight: 500;
-  color: #1e293b;
+  color: #1A1A1A; /* 使用侧边栏的正文颜色 */
 }
 
 .el-dialog__body {
@@ -49,23 +51,24 @@
 }
 
 .el-dialog__footer {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #E0E7FF; /* 使用侧边栏的边框颜色 */
   padding: 16px;
   text-align: right;
 }
+
 /* 表单输入框样式调整 */
 .el-input__inner {
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  font-family: 'Roboto', sans-serif;
+  border: 1px solid #E0E7FF; /* 使用侧边栏的边框颜色 */
+  font-family: 'Inter', sans-serif; /* 使用与侧边栏一致的字体 */
   font-size: 14px;
-  color: #1e293b;
+  color: #1A1A1A; /* 使用侧边栏的正文颜色 */
   transition: border-color 0.3s ease;
 }
 
 .el-input__inner:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  border-color: #6366F1; /* 使用侧边栏的主色调 */
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); /* 主色调的浅色阴影 */
 }
 
 /* 下拉选择框样式调整 */
@@ -79,15 +82,16 @@
 }
 
 .el-select-dropdown__item {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif; /* 使用与侧边栏一致的字体 */
   font-size: 14px;
-  color: #1e293b;
+  color: #1A1A1A; /* 使用侧边栏的正文颜色 */
 }
 
 .el-select-dropdown__item.selected {
-  background-color: #f0f4ff;
-  color: #2563eb;
+  background-color: #F0F4FF; /* 使用侧边栏的悬停背景色 */
+  color: #6366F1; /* 使用侧边栏的主色调 */
 }
+
 /* 表格样式调整 */
 .el-table {
   border-radius: 12px;
@@ -95,8 +99,8 @@
 }
 
 .el-table th {
-  background-color: #f3f4f6;
-  color: #1e293b;
+  background-color: #F8F9FF; /* 使用侧边栏的背景色 */
+  color: #1A1A1A; /* 使用侧边栏的正文颜色 */
   font-weight: 500;
 }
 
@@ -105,40 +109,45 @@
 }
 
 .el-table--striped .el-table__body tr.el-table__row--striped td {
-  background-color: #f9fafb;
+  background-color: #F8F9FF; /* 使用侧边栏的背景色 */
 }
 
 .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background-color: #f0f4ff;
+  background-color: #F0F4FF; /* 使用侧边栏的悬停背景色 */
 }
+
 /* 消息提示样式调整 */
 .el-message {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif; /* 使用与侧边栏一致的字体 */
   font-size: 14px;
 }
 
 .el-message--success {
-  background-color: #f0f9eb;
-  border-color: #e1f3d8;
-  color: #67c23a;
+  background-color: #F0F9EB;
+  border-color: #E1F3D8;
+  color: #67C23A;
 }
 
 .el-message--error {
-  background-color: #fef0f0;
-  border-color: #fde2e2;
-  color: #f56c6c;
+  background-color: #FEF0F0;
+  border-color: #FDE2E2;
+  color: #F56C6C;
 }
 
 .el-message--warning {
-  background-color: #fdf6ec;
-  border-color: #faecd8;
-  color: #e6a23c;
+  background-color: #FDF6EC;
+  border-color: #FAECD8;
+  color: #E6A23C;
 }
 
 .el-message--info {
-  background-color: #f4f4f5;
-  border-color: #e9e9eb;
+  background-color: #F4F4F5;
+  border-color: #E9E9EB;
   color: #909399;
 }
+
+
+
+

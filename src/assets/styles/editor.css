@@ -24,3 +24,25 @@
 .codex-editor--narrow .ce-toolbar__actions {
     right: -100px; /* Adjust toolbar position as needed */
 }
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* Roboto font */
+
+/* Set font-family to Roboto */
+.ce-block__content, 
+.ce-block, 
+.codex-editor__redactor, 
+.ce-toolbar__content {
+    
+    color: white; /* Set text color to white */
+}
+.cdx-marker{
+    background-color: transparent;
+    color: aquamarine;
+}
+
+/* .ce-toolbar__settings-btn{
+    color: white;
+}
+.ce-toolbar__plus {
+    color: white;
+} */

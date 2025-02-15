@@ -1,12 +1,19 @@
 <template>
-  <div style="width: 100%; margin-top: 20px;">
+  <div style="width: 100%;">
     <div class="notebook-detail">
       <!-- 笔记本封面及元信息 -->
       <div class="notebook-cover1">
+
         <img :src="notebook.cover" class="cover-image" alt="笔记本封面" />
         <div class="notebook-overlay"></div>
         <div class="notebook-meta">
+          <div style="display: flex; align-items: center;">
           <h1>{{ notebook.title }}</h1>
+          <div class="visibility" >
+              <i :class="notebook.visible == 1 ? 'fas fa-globe' : 'fas fa-lock'"></i>
+              <span>{{ notebook.visible ==1 ? '公开' : '私密' }}</span>
+            </div>
+          </div>
           <div class="meta-info">
             <div class="author">
               <img src="https://haowallpaper.com/link/common/file/previewFileImg/15798746313888064" style="width: 24px; height: 24px; border-radius: 50%;" />
@@ -14,10 +21,7 @@
             </div>
             <span>创建于 {{ formatDate(notebook.createTime) }}</span>
             <span>{{ notes.length }} 篇笔记</span>
-            <div class="visibility">
-              <i :class="notebook.visible == 1 ? 'fas fa-globe' : 'fas fa-lock'"></i>
-              <span>{{ notebook.visible ==1 ? '公开' : '私密' }}</span>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -46,8 +50,11 @@
             >
               <div class="note-content">
                 <h3>{{ note.title }}</h3>
-                <p class="note-description">{{ note.description || '暂无描述' }}</p>
+                <div class="note-description" style="margin-top: 10px;">
+                  {{ note.description.length > 100 ? note.description.slice(0, 100) + '...' : note.description }}
+                  </div>
                 <div class="note-details">
+                 
                   <div class="note-meta">
                     <span><i class="fas fa-clock"></i> {{ formatDate(note.createTime) }}</span>
                     <span><i class="fas fa-file-alt"></i> {{ note.wordCount || '0' }} 字</span>
@@ -345,7 +352,9 @@ export default {
     },
 
     viewNote(note) {
-      this.$router.push({ name: 'NoteDetail', params: { noteId: note.id } });
+      //this.$router.push({ name: 'NoteDetail', params: { noteId: note.id } });
+      //变为新界面打开
+      window.open(`/home/note${note.id}`, '_blank');
     },
 
     showCreateNoteDialog() {
@@ -454,6 +463,7 @@ export default {
         alert('获取笔记本数据失败，请稍后重试');
       }
     },
+
   },
   mounted() {
     this.getNoteBookData();
@@ -461,19 +471,24 @@ export default {
 };
 </script>
 
-<style>
+
+<style scoped>
 /* 全局样式 */
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */
+ 
 }
 
+.notebook-detail{
+  height: 100vh;
+  background: linear-gradient(to bottom right, #f8f9ff, #ffffff); /* 浅色渐变背景 */
+}
 
 /* 笔记本封面 */
 .notebook-cover {
-  
   width: 100%;
 }
 
@@ -481,7 +496,7 @@ body {
   position: absolute;/*设为绝对定位*/
   opacity: 0.7;/*设置透明度*/
   width: 100%;
-  height: 200px; /* 固定高度 */
+  height: 50px; /* 固定高度 */
   /* object-fit: cover; */
 }
 
@@ -492,27 +507,31 @@ body {
   right: 0;
   bottom: 0;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
-  height: 256px;
+  height: 50px;
 }
 
 .notebook-meta {
   position: absolute;
   /* bottom: 20px; */
-  left: 20px;
   color: white;
-  padding: 0px 16px 0px 16px;
-  margin: 0 200px;
+  margin: 50px 90px;
 }
 
 .notebook-meta h1 {
-  font-size: 24px;
-  margin-bottom: 8px;
-  font-feature-settings: "kern" on;
-color: #FFFFFF;
+ 
+
 font-size: 30px;
 font-weight: 500;
 line-height: 36px;
 letter-spacing: 0px;
+font-size: 30px;
+font-weight: bold;
+line-height: 36px;
+letter-spacing: 0px;
+
+font-feature-settings: "kern" on;
+color: #FFFFFF;
+margin-right: 20px;
 }
 
 .meta-info {
@@ -583,7 +602,7 @@ color: #E5E7EB;
 
 .btn-new-note {
   padding: 8px 16px;
-  background-color: #1e90ff;
+  background-color: #4f46e5;
   color: white;
   border: none;
   border-radius: 20px;
@@ -628,7 +647,7 @@ color: #E5E7EB;
   transition: box-shadow 0.3s;
   position: relative;
   width: 896px;
-  height: 178px;
+  height: 130px;
 }
 
 .note-item:hover {
@@ -646,7 +665,7 @@ color: #1F2937;
 }
 
 .note-description {
-  height: 72px;
+
 opacity: 1;
 
 font-family: Roboto;
@@ -663,13 +682,10 @@ font-feature-settings: "kern" on;
   gap: 16px;
   font-size: 12px;
   color: #666;
-
   position: absolute;
-left: 25px;
-top: 129px;
-width: 846px;
-height: 24px;
-opacity: 1;
+  width: 846px;
+  height: 24px;
+  opacity: 1;
 }
 
 .note-meta {
@@ -842,7 +858,7 @@ opacity: 1;
 .notebook-cover1 {
   position: relative;
   width: 100%;
-  height: 256px;
+  height: 200px;
   overflow: hidden;
 }
 
@@ -863,12 +879,7 @@ opacity: 1;
   height: 100%;
 }
 
-.notebook-meta {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  color: white;
-}
+
 
 /* 笔记本封面 */
 /* 笔记操作按钮样式 */
@@ -941,7 +952,7 @@ opacity: 1;
   transition: box-shadow 0.3s ease;
   position: relative;
   width: 896px;
-  height: 178px;
+  height: 110px;
 }
 
 .note-item:hover {
@@ -951,14 +962,14 @@ opacity: 1;
 .note-content h3 {
   font-size: 18px;
   font-weight: 500;
-  line-height: 28px;
+  line-height: 10px;
   letter-spacing: 0px;
   color: #1f2937;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .note-description {
-  height: 72px;
+  height: 20px;
   opacity: 1;
   font-family: Roboto;
   font-size: 16px;
@@ -974,8 +985,8 @@ opacity: 1;
   font-size: 12px;
   color: #666;
   position: absolute;
-  left: 25px;
-  top: 129px;
+  left: 20px;
+  top: 110px;
   width: 846px;
   height: 24px;
   opacity: 1;

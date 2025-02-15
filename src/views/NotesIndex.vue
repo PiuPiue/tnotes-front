@@ -479,6 +479,8 @@ export default {
   },
 };
 </script>
+
+
 <style scoped>
 /* 全局样式 */
 .notes-dashboard {
@@ -1272,5 +1274,17 @@ letter-spacing: 0px;
 
 .btn-icon:hover {
   background-color: #f3f4f6;
+}
+
+.note-icon {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  color: #4f46e5;
+  font-size: 2rem;
 }
 </style>

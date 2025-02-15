@@ -3,8 +3,9 @@
       <div class="auth-box">
         <!-- 顶部图片和网站名称 -->
         <div class="auth-header">
-          <img src="../assets/images/生成网站图标.png" alt="Logo" class="logo" />
-          <span class="site-name">T-Notes</span>
+          <!-- <span class="site-name">T-Notes</span> -->
+          <img src="../assets/images/logo-png.png" alt="Logo" class="logo" />
+         
         </div>
   
         <!-- 切换按钮 -->
@@ -50,7 +51,7 @@
             <div class="form-group">
               <input
                 type="text"
-                v-model="registerForm.username"
+                v-model="registerForm.name"
                 placeholder="用户名"
                 required
               />
@@ -74,7 +75,7 @@
             <div class="form-group code-group">
               <input
                 type="text"
-                v-model="registerForm.code"
+                v-model="registerForm.authCode"
                 placeholder="验证码"
                 required
               />
@@ -95,7 +96,7 @@
   </template>
   
   <script>
-  import { login } from '@/utils/api';
+  import { login,sendVerificationCode ,register} from '@/utils/api';
   export default {
     name: 'AuthIndex',
     data() {
@@ -103,13 +104,14 @@
         isLogin: false, // 当前是登录还是注册
         loginForm: {
           name: '',
+          email: '',
           password: ''
         },
         registerForm: {
-          username: '',
+          name: '',
           email: '',
           password: '',
-          code: ''
+          authCode: ''
         },
         isCodeSent: false, // 是否已发送验证码
         countdown: 60 // 验证码倒计时
@@ -129,12 +131,16 @@
         if (!this.validateLoginForm()) return;
   
         try {
+          if(this.loginForm.name.includes('@')){
+            this.loginForm.email = this.loginForm.name;
+            this.loginForm.name = null;
+          }
           const response = await login(this.loginForm)
           if (response.data.code == 200) {
             this.$message.success('登录成功');
             localStorage.setItem('Authorization', response.data.data.token);
             localStorage.setItem('userInfo', JSON.stringify(response.data.data));
-            this.$router.push('/home/newworld'); // 跳转到首页
+            this.$router.push('/home/quickstart'); // 跳转到首页
           } else {
             this.$message.error('登录失败：' + response.data.message);
           }
@@ -147,9 +153,9 @@
         if (!this.validateRegisterForm()) return;
   
         try {
-          const response = await this.$http.post('/api/register', this.registerForm);
-          if (response.data.success) {
-            this.$message('注册成功');
+          const response = await register(this.registerForm)
+          if (response.data.code == 200) {
+            this.$message.success('注册成功');
             this.switchToLogin(); // 注册成功后切换到登录
           } else {
             alert('注册失败：' + response.data.message);
@@ -161,23 +167,21 @@
       // 发送验证码
       async sendCode() {
         if (!this.validateEmail()) {
-          alert('请输入有效的邮箱地址');
+          this.$message.error('请输入正确的邮箱');
           return;
         }
   
         try {
-          const response = await this.$http.post('/api/send-code', {
-            email: this.registerForm.email
-          });
-          if (response.data.success) {
+          const response = await sendVerificationCode(this.registerForm.email)
+          this.startCountdown();
+          if (response.data.code==200) {
             this.isCodeSent = true;
-            this.startCountdown();
-            alert('验证码已发送');
+            this.$message.success('验证码发送成功');
           } else {
-            alert('发送验证码失败：' + response.data.message);
+            this.$message.error('验证码发送失败' );
           }
         } catch (error) {
-          alert('发送验证码失败：' + error.message);
+          this.$message.error('验证码发送失败' );
         }
       },
       // 开始倒计时
@@ -201,7 +205,7 @@
       },
       // 验证注册表单
       validateRegisterForm() {
-        if (!this.registerForm.username || !this.registerForm.email || !this.registerForm.password || !this.registerForm.code) {
+        if (!this.registerForm.name || !this.registerForm.email || !this.registerForm.password || !this.registerForm.authCode) {
           alert('请填写所有字段');
           return false;
         }
@@ -214,6 +218,7 @@
       // 验证邮箱格式
       validateEmail() {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
         return emailPattern.test(this.registerForm.email);
       }
     }
@@ -260,7 +265,7 @@
     font-style: italic;
     font-size: 30px;
     font-weight: bold;
-    color: #1E90FF;
+    color: #6366f1;
   }
   
   .auth-switch {
@@ -315,7 +320,7 @@
   
   .code-button {
     padding: 10px 15px;
-    background-color: #1E90FF;
+    background-color: #6366f1;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -332,7 +337,7 @@
   .auth-button {
     width: 100%;
     padding: 12px;
-    background-color: #1E90FF;
+    background-color: #6663f1;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -342,7 +347,7 @@
   }
   
   .auth-button:hover {
-    background-color: #0077cc;
+    background-color: #6663f1;
   }
   
   /* 动画效果 */

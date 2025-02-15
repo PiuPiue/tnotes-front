@@ -28,11 +28,45 @@
           placeholder="请输入笔记标题"
           class="note-title"
         />
+        <!-- 添加 description 区域 -->
+        <div class="description-container">
+          <textarea
+            v-model="note.description"
+            placeholder="请输入笔记描述"
+            class="note-description"
+          ></textarea>
+        </div>
         <div id="editorjs"></div>
       </div>
 
+
+      
+
       <!-- 右侧侧边栏 -->
       <aside class="sidebar">
+
+
+           <!-- AI 助手 -->
+        <div class="info-card">
+          <div class="card-header">
+            <h3 class="card-title">AI 助手</h3>
+          </div>
+          <button class="ai-action" @click="warnn()">
+            <i class="fas fa-magic"></i>
+            <span>优化文章结构</span>
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <button class="ai-action"  @click="warnn()">
+            <i class="fas fa-check-circle"></i>
+            <span>检查语法错误</span>
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <button class="ai-action"  @click="generateSummary()">
+            <i class="fas fa-file-alt"></i>
+            <span>生成摘要</span>
+            <i class="fas fa-chevron-right"  @click="warnn()"></i>
+          </button>
+        </div>
         <!-- 文档信息 -->
         <div class="info-card">
           <h3 class="card-title">文档信息</h3>
@@ -46,32 +80,11 @@
           </div>
           <div class="info-item">
             <span>当前字数</span>
-            <span>2,450字</span>
+            <span>{{wordCount}}字</span>
           </div>
         </div>
 
-        <!-- AI 助手 -->
-        <div class="info-card">
-          <div class="card-header">
-            <h3 class="card-title">AI 助手</h3>
-
-          </div>
-          <button class="ai-action">
-            <i class="fas fa-magic"></i>
-            <span>优化文章结构</span>
-            <i class="fas fa-chevron-right"></i>
-          </button>
-          <button class="ai-action">
-            <i class="fas fa-check-circle"></i>
-            <span>检查语法错误</span>
-            <i class="fas fa-chevron-right"></i>
-          </button>
-          <button class="ai-action">
-            <i class="fas fa-file-alt"></i>
-            <span>生成摘要</span>
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
+     
 
         <!-- 协作者部分 -->
         <div class="info-card">
@@ -125,6 +138,29 @@
           </template>
         </el-dialog>
       </aside>
+
+      <!-- 摘要弹窗 -->
+    <transition name="fade">
+      <div v-if="showSummaryModal" class="summary-modal">
+        <div class="modal-overlay" @click="closeSummaryModal"></div>
+        <div class="modal-content">
+          <!-- 加载动画 -->
+          <div v-if="isLoading" class="loading-animation">
+            <div class="particle-loader"></div>
+            <p class="loading-text">AI 正在分析中...</p>
+          </div>
+
+          <!-- 摘要内容 -->
+          <div v-else class="summary-result">
+            <h3>摘要</h3>
+            <p>{{ summaryText }}</p>
+            <button class="btn-copy" @click="copySummary">
+              <i class="fas fa-copy"></i> 复制摘要
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
     </main>
 
     <!-- 分享弹窗 -->
@@ -155,7 +191,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import '@/assets/styles/editor.css'
 import EditorJS from "@editorjs/editorjs";
@@ -169,7 +204,7 @@ import Table from "@editorjs/table";
 import Marker from "@editorjs/marker";
 import InlineCode from "@editorjs/inline-code";
 import editorjsCodecup from '@calumk/editorjs-codecup';
-import { addNoteContent, getNote ,getNoteCoopUsers,changeNotePermission,deleteNotePermission,getNoteShareCode,updateNote} from "@/utils/api";
+import { addNoteContent, getNote ,getNoteCoopUsers,changeNotePermission,deleteNotePermission,getNoteShareCode,updateNote,getEssaySummary} from "@/utils/api";
 import { Message } from "element-ui";
 import 'prismjs/components/prism-python';     // 引入 Python 高亮支持
 
@@ -177,7 +212,12 @@ import 'prismjs/components/prism-python';     // 引入 Python 高亮支持
 export default {
   name: "NoteDetail",
   data() {
-    return { // 分享弹窗相关数据
+    return { 
+      wordCount: 0, // 新增字段，用于存储当前字数
+      showSummaryModal: false, // 控制弹窗显示
+      isLoading: false, // 控制加载状态
+      summaryText: "", // 生成的摘要内容
+      // 分享弹窗相关数据
       shareDialogVisible: false, // 控制分享弹窗的显示
       shareForm: {
         type: 1, // 分享类型，默认仅阅读
@@ -214,7 +254,23 @@ export default {
     };
   },
   methods: {
-     // 打开分享弹窗
+    async updateWordCount() {
+    try {
+      const outputData = await this.editor.save();
+      let textContent = 0;
+      outputData.blocks.forEach(block => {
+        if (block.type === 'paragraph') {
+          textContent += block.data.text.length;
+        }
+      });
+      this.wordCount = textContent; // 更新字数
+    } catch (error) {
+      console.error('Error updating word count:', error);
+    }
+  },
+    warnn(){
+      this.$message.warning('还在开发中，敬请期待~~~')
+    },     // 打开分享弹窗
      openShareDialog() {
       this.shareDialogVisible = true;
     },
@@ -351,7 +407,15 @@ export default {
               },
             },
             list: List,
-            image: ImageTool,
+            image: {
+                class: ImageTool,
+              config: {
+                endpoints: {
+                  byFile: 'https://notes.t-music.cn/api/minio/upload', // 上传图片接口
+                },
+
+              },
+            },
             quote: Quote,
             code: editorjsCodecup,
             embed: Embed,
@@ -363,19 +427,18 @@ export default {
           data: this.note.content,
           minHeight: 300,
           onReady: () => {
-            
-
             resolve();
           },
           onChange: async () => {
+            this.updateWordCount()
             const data = await this.editor.save();
-  // 确保空段落也被包含
-  if (data.blocks.length >= 0) {
-    this.note.content = data;
-    this.broadcastDocumentUpdate(data);
-  }
-          },
-        });
+            // 确保空段落也被包含
+            if (data.blocks.length >= 0) {
+              this.note.content = data;
+              this.broadcastDocumentUpdate(data);
+              }
+            },
+          });
 
         // 监听光标位置变化
         const editorElement = document.getElementById("editorjs");
@@ -395,6 +458,7 @@ export default {
         const notedto = {
           id: this.note.id,
           title: this.note.title,
+          description: this.note.description,
         }
         const editorData = await this.editor.save();
         const res1 = await updateNote(notedto);
@@ -449,7 +513,7 @@ export default {
 
     initWebSocket() {
       // 创建 WebSocket 连接
-      this.socket = new WebSocket(`ws://localhost:8081/coop?noteId=${this.$route.params.noteId}`);
+      this.socket = new WebSocket(`wss://websocket.t-music.cn/coop?noteId=${this.$route.params.noteId}`);
 
       // WebSocket 连接成功
       this.socket.onopen = () => {
@@ -546,8 +610,8 @@ export default {
     },
 
     updateCursorPosition(clientId, position) {
-  const cursor = this.cursors.get(clientId);
-  if (!cursor || !position) return;
+      const cursor = this.cursors.get(clientId);
+      if (!cursor || !position) return;
 
   try {
     const editorElement = document.getElementById("editorjs");
@@ -623,7 +687,7 @@ export default {
   } catch (err) {
     console.error("Error updating cursor position:", err);
   }
-},
+    },
 
     broadcastCursorPosition(blockIndex, offset) {
       if (this.socket.readyState === WebSocket.OPEN) {
@@ -688,7 +752,61 @@ export default {
       const res = await getNoteCoopUsers(this.$route.params.noteId)
       this.coopUsers = res.data.data;
       console.log(this.coopUsers)
+    },
+
+    async generateSummary() {
+      this.showSummaryModal = true;
+      this.isLoading = true;
+
+      // 模拟 AI 分析过程
+      try {
+        const data = await this.extractText();
+        const dto = { message: data };
+        const res = await getEssaySummary(dto);
+        this.summaryText = res.data.data;
+      } catch (error) {
+        console.error("生成摘要失败:", error);
+        this.summaryText = "生成摘要失败，请稍后重试。";
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    // 复制摘要
+    copySummary() {
+      navigator.clipboard.writeText(this.summaryText)
+        .then(() => {
+          this.$message.success("摘要已复制到剪贴板");
+        })
+        .catch(() => {
+          this.$message.error("复制失败，请手动复制");
+        });
+    },
+
+    // 关闭弹窗
+    closeSummaryModal() {
+      this.showSummaryModal = false;
+      this.isLoading = false;
+      this.summaryText = "";
+    },
+
+    extractText() {
+      return this.editor.save().then((outputData) => {
+        // 遍历 editorjs 的输出，提取纯文本
+        let textContent = '';
+        outputData.blocks.forEach(block => {
+         
+          if (block.type === 'paragraph') {
+            textContent += block.data.text + '\n';
+          }
+          
+        });
+        return textContent;
+      }).catch((error) => {
+        console.log('Error saving data: ', error);
+      });
     }
+    
   },
   mounted() {
     if (this.$route.params.noteId) {
@@ -712,15 +830,16 @@ export default {
     }
     
   },
+ 
 };
 </script>
 
 <style scoped>
-
 /* 全局样式 */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f9fafb;
+  font-family: 'Roboto', sans-serif;
+  background-color: #1e1e2f;
+  color: #ffffff;
   margin: 0;
   padding: 0;
 }
@@ -731,16 +850,16 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  background: linear-gradient(135deg, #2a2a40, #1e1e2f);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
 .header-content {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -753,22 +872,9 @@ body {
   gap: 16px;
 }
 
-.btn-back {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #6b7280;
-  font-size: 16px;
-  transition: color 0.2s;
-}
-
-.btn-back:hover {
-  color: #3b82f6;
-}
-
 .notebook-name {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 16px;
+  color: #a0a0c0;
 }
 
 .btn-share,
@@ -776,36 +882,38 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s, color 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-share {
-  color: #3b82f6;
-  background-color: transparent;
+  background: linear-gradient(135deg, #00aaff, #0077cc);
+  color: #ffffff;
 }
 
 .btn-share:hover {
-  background-color: #f0f4ff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 170, 255, 0.3);
 }
 
 .btn-save {
-  background-color: #3b82f6;
+  background: linear-gradient(135deg, #00ff88, #00cc66);
   color: #ffffff;
 }
 
 .btn-save:hover {
-  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
 }
 
 /* 主体内容 */
 .main-content {
   max-width: 1440px;
-  margin: 80px auto 0;
+  margin: 100px auto 0;
   padding: 24px;
   display: flex;
   gap: 24px;
@@ -813,9 +921,9 @@ body {
 
 .editor-container {
   flex: 1;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #2a2a40, #1e1e2f);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   padding: 24px;
 }
 
@@ -826,13 +934,28 @@ body {
   border: none;
   outline: none;
   margin-bottom: 24px;
-  padding: 8px;
-  background-color: #f9fafb;
-  border-radius: 4px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
 }
 
-.note-editor {
-  min-height: 500px;
+.description-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.note-description {
+  width: 100%;
+  font-size: 14px;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  min-height: 80px;
+  color: #ffffff;
 }
 
 /* 侧边栏 */
@@ -842,17 +965,17 @@ body {
 }
 
 .info-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #2a2a40, #1e1e2f);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   padding: 20px;
   margin-bottom: 16px;
 }
 
 .card-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #00ff88;
   margin-bottom: 16px;
 }
 
@@ -860,7 +983,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  color: #6b7280;
+  color: #a0a0c0;
   margin-bottom: 12px;
 }
 
@@ -870,109 +993,24 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: none;
+  background: rgba(255, 255, 255, 0.05);
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #4b5563;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  color: #ffffff;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .ai-action:hover {
-  background-color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .version-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-avatar {
-  width: 30px;
-  height: 30px;
-  background-color: #e5e7eb;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-name {
-  font-size: 14px;
-  color: #111827;
-}
-
-.version-time {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.btn-view {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: #3b82f6;
-  transition: color 0.2s;
-}
-
-.btn-view:hover {
-  color: #2563eb;
-}
-
-.remote-cursor {
-  position: absolute;
-  pointer-events: none;
-  transition: all 0.1s ease;
-  z-index: 1000;
-}
-
-.cursor-flag {
-  background-color: #ff6b6b;
-  padding: 2px 6px;
-  border-radius: 3px;
-  color: white;
-  font-size: 12px;
-}
-
-.cursor-line {
-  width: 2px;
-  height: 24px;
-  background-color: #ff6b6b;
-}
-
-/* 新增编辑器容器定位样式 */
-#editorjs {
-  position: relative;
-  min-height: 300px; /* 确保编辑器有最小高度 */
-}
-
-/* 协作者部分样式 */
-.info-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 16px;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 16px;
-}
-
-.version-item {
   margin-bottom: 12px;
 }
 
@@ -988,12 +1026,12 @@ body {
 
 .user-name {
   font-size: 14px;
-  color: #111827;
+  color: #ffffff;
 }
 
 .user-permission {
   font-size: 12px;
-  color: #6b7280;
+  color: #a0a0c0;
 }
 
 .user-actions {
@@ -1002,15 +1040,130 @@ body {
 
 .btn-more {
   padding: 0;
-  color: #6b7280;
+  color: #a0a0c0;
 }
 
 .btn-more:hover {
-  color: #3b82f6;
+  color: #00ff88;
 }
 
-/* 分享弹窗样式 */
-.share-dialog .el-input__inner {
+/* 弹窗样式 */
+.summary-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+.modal-content {
+  position: relative;
+  background: linear-gradient(135deg, #2a2a40, #1e1e2f);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  text-align: center;
+}
+
+/* 加载动画 */
+.loading-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.particle-loader {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#00ff88, #00aaff, #ff00ff, #00ff88);
+  animation: spin 1.5s linear infinite;
+  position: relative;
+}
+
+.particle-loader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 50%, #1e1e2f 70%);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #00ff88;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+}
+
+/* 摘要内容 */
+.summary-result {
+  text-align: left;
+}
+
+.summary-result h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #00ff88;
+}
+
+.summary-result p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.btn-copy {
+  background: linear-gradient(135deg, #00ff88, #00aaff);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: #fff;
+  font-size: 14px;
   cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-copy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+}
+
+/* 弹窗过渡动画 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

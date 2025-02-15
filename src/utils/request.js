@@ -5,7 +5,7 @@ import { alertError } from "./alert";
 
 // 创建 Axios 实例
 const req = axios.create({
-  baseURL: 'http://localhost:8081',
+  baseURL: 'https://notes.t-music.cn/api',
   timeout: 100000,
  
   transformResponse: [function (data) {
@@ -44,6 +44,10 @@ req.interceptors.response.use(
       } else {
         const errorMessage = response.data.message || '请求失败，请稍后再试';
         alertError(errorMessage)
+        if(response.data.code == 401){
+          localStorage.removeItem('Authorization');
+          window.location.href = '/login';
+        }
       }
     } else {
       return response;  // 如果没有 code 字段，返回正常响应
