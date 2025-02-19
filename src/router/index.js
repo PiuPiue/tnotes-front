@@ -17,6 +17,7 @@ import NotFoundPage from '@/views/NotFound.vue'
 import UserInfo from '@/views/UserInfo.vue'
 import IntroductionIndex from '@/views/IntroductionIndex.vue'
 
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -181,6 +182,7 @@ const routes = [
       keywords: '用户信息,个人资料,账户管理'
     }
   },
+
   {
     path: '*',
     name: 'NotFound',
@@ -228,33 +230,33 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
-function getRoutesList(routes, pre) {
-  return routes.reduce((array, route) => {
-    const path = `${pre}${route.path}`;
+// function getRoutesList(routes, pre) {
+//   return routes.reduce((array, route) => {
+//     const path = `${pre}${route.path}`;
  
-    if (route.path !== '*') {
-      array.push(path);
-    }
+//     if (route.path !== '*') {
+//       array.push(path);
+//     }
  
-    if (route.children) {
-      array.push(...getRoutesList(route.children, `${path}/`));
-    }
+//     if (route.children) {
+//       array.push(...getRoutesList(route.children, `${path}/`));
+//     }
  
-    return array;
-  }, []);
-}
+//     return array;
+//   }, []);
+// }
  
  
 // getRoutesList(router.options.routes, 'https://zigamiklic.com');
-function getRoutesXML() {
-  const list = getRoutesList(router.options.routes, 'https://notes.t-music.cn')
-    .map(route => `<url><loc>${route} </loc></url>`)
-    .join('\r\n');
-  return `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-    ${list}
-  </urlset>`;
-}
+// function getRoutesXML() {
+//   const list = getRoutesList(router.options.routes, 'https://notes.t-music.cn')
+//     .map(route => `<url><loc>${route} </loc></url>`)
+//     .join('\r\n');
+//   return `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+//     ${list}
+//   </urlset>`;
+// }
  
-console.log(getRoutesXML())
+// console.log(getRoutesXML())
 
 export default router

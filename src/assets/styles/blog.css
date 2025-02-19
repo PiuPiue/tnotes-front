@@ -1,0 +1,14 @@
+/* Set the block width (default: 780px) */
+:root {
+    --block-width: 750px; /* Change this value to set your desired block width */
+}
+
+/* Apply the block width to EditorJS elements */
+.ce-block__content,  /* Content inside each block */
+.ce-block,           /* The block wrapper */
+.codex-editor__redactor, /* Main editing area */
+.ce-toolbar__content { /* Toolbar content for editing */
+    max-width: var(--block-width); /* Use the block width set in :root */
+    width: var(--block-width); /* Apply the block width */
+    margin: 0 auto; /* Center the blocks */
+}

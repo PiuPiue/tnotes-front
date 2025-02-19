@@ -352,8 +352,6 @@ export default {
     },
 
     viewNote(note) {
-      //this.$router.push({ name: 'NoteDetail', params: { noteId: note.id } });
-      //变为新界面打开
       window.open(`/home/note${note.id}`, '_blank');
     },
 
@@ -380,7 +378,7 @@ export default {
               this.createNoteDialogVisible = false;
               this.getNotesData();
               if (!this.isEditMode) {
-                this.$router.push({ name: 'NoteDetail', params: { noteId: res.data.data } });
+                window.open(`/home/note${res.data.data}`, '_blank');
               }
             } else {
               this.$message.error(this.isEditMode ? '笔记更新失败' : '笔记创建失败');
@@ -479,10 +477,9 @@ body {
   margin: 0;
   padding: 0;
   /* background-color: #f8f9fa; */
- 
 }
 
-.notebook-detail{
+.notebook-detail {
   height: 100vh;
   background: linear-gradient(to bottom right, #f8f9ff, #ffffff); /* 浅色渐变背景 */
 }
@@ -493,8 +490,8 @@ body {
 }
 
 .cover-image {
-  position: absolute;/*设为绝对定位*/
-  opacity: 0.7;/*设置透明度*/
+  position: absolute; /* 设为绝对定位 */
+  opacity: 0.7; /* 设置透明度 */
   width: 100%;
   height: 50px; /* 固定高度 */
   /* object-fit: cover; */
@@ -518,20 +515,17 @@ body {
 }
 
 .notebook-meta h1 {
- 
-
-font-size: 30px;
-font-weight: 500;
-line-height: 36px;
-letter-spacing: 0px;
-font-size: 30px;
-font-weight: bold;
-line-height: 36px;
-letter-spacing: 0px;
-
-font-feature-settings: "kern" on;
-color: #FFFFFF;
-margin-right: 20px;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 36px;
+  letter-spacing: 0px;
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 36px;
+  letter-spacing: 0px;
+  font-feature-settings: "kern" on;
+  color: #FFFFFF;
+  margin-right: 20px;
 }
 
 .meta-info {
@@ -539,12 +533,11 @@ margin-right: 20px;
   gap: 16px;
   align-items: center;
   font-size: 14px;
-font-weight: normal;
-line-height: 20px;
-letter-spacing: 0px;
-
-font-feature-settings: "kern" on;
-color: #E5E7EB;
+  font-weight: normal;
+  line-height: 20px;
+  letter-spacing: 0px;
+  font-feature-settings: "kern" on;
+  color: #E5E7EB;
 }
 
 .author {
@@ -581,6 +574,10 @@ color: #E5E7EB;
 
 .notes-section {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 800px;
+  
 }
 
 .notes-header {
@@ -635,7 +632,14 @@ color: #E5E7EB;
 .notes-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  overflow-y: auto;
+  height: calc(100vh - 300px);
+    width: 100%;
+  scroll-behavior: smooth; /* 添加平滑滚动效果 */
+}
+
+.notes-list::-webkit-scrollbar {
+  display: none; /* 隐藏滚动条 */
 }
 
 .note-item {
@@ -645,48 +649,40 @@ color: #E5E7EB;
   padding: 16px;
   cursor: pointer;
   transition: box-shadow 0.3s;
-  position: relative;
+  
   width: 896px;
   height: 130px;
+  margin-bottom: 15px;
 }
 
 .note-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translate(15px, 0px) scale(1.01); /* 放大 5% */
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .note-content h3 {
   font-size: 18px;
-font-weight: 500;
-line-height: 28px;
-letter-spacing: 0px;
-
-font-feature-settings: "kern" on;
-color: #1F2937;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0px;
+  font-feature-settings: "kern" on;
+  color: #1F2937;
 }
 
 .note-description {
-
-opacity: 1;
-
-font-family: Roboto;
-font-size: 16px;
-font-weight: normal;
-line-height: 24px;
-letter-spacing: 0px;
-color: #4B5563;
-font-feature-settings: "kern" on;
-}
-
-.note-details {
-  display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: #666;
-  position: absolute;
-  width: 846px;
-  height: 24px;
   opacity: 1;
+  font-family: Roboto;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #4B5563;
+  font-feature-settings: "kern" on;
 }
+
+
+
 
 .note-meta {
   display: flex;
@@ -879,9 +875,6 @@ font-feature-settings: "kern" on;
   height: 100%;
 }
 
-
-
-/* 笔记本封面 */
 /* 笔记操作按钮样式 */
 .note-actions {
   position: absolute;
@@ -977,23 +970,20 @@ font-feature-settings: "kern" on;
   line-height: 24px;
   letter-spacing: 0px;
   color: #4b5563;
+  margin-top: 10px;
 }
 
 .note-details {
-  display: flex;
+ 
   gap: 16px;
   font-size: 12px;
   color: #666;
-  position: absolute;
-  left: 20px;
-  top: 110px;
-  width: 846px;
-  height: 24px;
-  opacity: 1;
+  margin-top: 20px;
 }
 
 .note-meta {
   display: flex;
+  margin-top: 30px;
   gap: 8px;
 }
 
